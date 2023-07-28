@@ -1,110 +1,60 @@
 package ru.netology.page;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
-import ru.netology.data.DataHelper;
+import ru.netology.data.Card;
 
 import java.time.Duration;
-import java.util.List;
 
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.*;
 
 public class CreditPage {
-    private SelenideElement title = $x("//*[@id=\"root\"]/div/h3");
-    private List<SelenideElement> input = $$(".input__control");
-    private SelenideElement cardNumber = input.get(0);
-    private SelenideElement month = input.get(1);
-    private SelenideElement year = input.get(2);
-    private SelenideElement holder = input.get(3);
-    private SelenideElement cvc = input.get(4);
-    private SelenideElement continueButton = $(byText("Продолжить"));
-    private SelenideElement cardNumberError = $(byText("Номер карты")).parent().$(".input__sub");
-    private SelenideElement monthError = $(byText("Месяц")).parent().$(".input__sub");
-    private SelenideElement yearError = $(byText("Год")).parent().$(".input__sub");
-    private SelenideElement holderError = $(byText("Владелец")).parent().$(".input__sub");
-    private SelenideElement cvcError = $(byText("CVC/CVV")).parent().$(".input__sub");
-    private SelenideElement approvedNotification = $(".notification_status_ok");
-    private SelenideElement declinedNotification = $(".notification_status_error");
+    SelenideElement titleCardPayment = $x("//h3[text()[contains(., 'Кредит по данным карты')]]");
+    SelenideElement cardNumber = $x("//*[contains(text(), 'Номер карты')]/../span/input");
+    SelenideElement month = $x("//*[contains(text(), 'Месяц')]/../*/input");
+    SelenideElement year = $x("//*[contains(text(), 'Год')]/../*/input");
+    SelenideElement owner = $x("//*[contains(text(), 'Владелец')]/../*/input");
+    SelenideElement cvc = $x("//*[contains(text(), 'CVC/CVV')]/../*/input");
+    SelenideElement continueButton = $x("//*[text()[contains(., 'Продолжить')]]");
 
     public CreditPage() {
-        title.shouldBe(visible);
-        title.shouldHave(text("Кредит по данным карты"));
+        titleCardPayment.shouldBe(Condition.visible);
     }
 
-    public void formInput(DataHelper.CardInfo card) {
-        cardNumber.setValue(card.getCardNumber());
-        month.setValue(card.getMonth());
-        year.setValue(card.getYear());
-        holder.setValue(card.getHolder());
-        cvc.setValue(card.getCardCVC());
+    public void pay(Card data) {
+        setElementValue(cardNumber, data.getNumber());
+        setElementValue(month, data.getMonth());
+        setElementValue(year, data.getYear());
+        setElementValue(owner, data.getOwner());
+        setElementValue(cvc, data.getCvv());
         continueButton.click();
     }
 
-    public void checkApprovedNotification() {
-        approvedNotification.shouldBe(visible, Duration.ofMillis(15000));
-        approvedNotification.shouldHave(text("Операция одобрена Банком"));
+    private void setElementValue(SelenideElement element, String value) {
+        element.click();
+        element.setValue(value);
     }
 
-    public void checkDeclinedNotification() {
-        declinedNotification.shouldBe(visible, Duration.ofMillis(15000));
-        approvedNotification.shouldHave(text("Ошибка! Банк отказал в проведении операции."));
+    public void approved() {
+        SelenideElement successfulNotification = $(".notification_status_ok .notification__content").shouldHave(Condition.text("Операция одобрена Банком."), Duration.ofMillis(20000));
+        successfulNotification.shouldBe(Condition.visible);
     }
 
-    public void checkNumberCardError() {
-        cardNumberError.shouldBe(visible);
-        cardNumberError.shouldHave(text("Неверный формат"));
-        monthError.shouldNotBe(visible);
-        yearError.shouldNotBe(visible);
-        holderError.shouldNotBe(visible);
-        cvcError.shouldNotBe(visible);
+    public void declined() {
+        SelenideElement declineNotification = $(".notification_status_error .notification__content").shouldHave(Condition.text("Ошибка! Банк отказал в проведении операции."), Duration.ofMillis(15000));
+        declineNotification.shouldBe(Condition.visible);
     }
 
-    public void checkMonthError() {
-        monthError.shouldBe(visible);
-        monthError.shouldHave(text("Неверный формат"));
-        cardNumberError.shouldNotBe(visible);
-        yearError.shouldNotBe(visible);
-        holderError.shouldNotBe(visible);
-        cvcError.shouldNotBe(visible);
+    public void wrongFormatNotification() {
+        SelenideElement wrongFormat = $(".input__sub").shouldHave(Condition.text("Неверный формат"));
+        wrongFormat.shouldBe(Condition.visible);
     }
 
-    public void checkYearError() {
-        yearError.shouldBe(visible);
-        yearError.shouldHave(text("Неверный формат"));
-        cardNumberError.shouldNotBe(visible);
-        monthError.shouldNotBe(visible);
-        holderError.shouldNotBe(visible);
-        cvcError.shouldNotBe(visible);
+    public void requiredFieldNotification() {
+        SelenideElement empty = $(".input__sub").shouldHave(Condition.text("Поле обязательно для заполнения"));
+        empty.shouldBe(Condition.visible);
     }
 
-    public void checkHolderError() {
-        holderError.shouldBe(visible);
-        holderError.shouldHave(text("Поле обязательно для заполнения"));
-        cardNumberError.shouldNotBe(visible);
-        monthError.shouldNotBe(visible);
-        yearError.shouldNotBe(visible);
-        cvcError.shouldNotBe(visible);
-    }
-
-    public void checkHolderErrorPattern() {
-        holderError.shouldBe(visible);
-        holderError.shouldHave(text("Неверный формат"));
-        cardNumberError.shouldNotBe(visible);
-        monthError.shouldNotBe(visible);
-        yearError.shouldNotBe(visible);
-        cvcError.shouldNotBe(visible);
-    }
-
-    public void checkCVCError() {
-        cvcError.shouldBe(visible);
-        cvcError.shouldHave(text("Неверный формат"));
-        cardNumberError.shouldNotBe(visible);
-        monthError.shouldNotBe(visible);
-        yearError.shouldNotBe(visible);
-        holderError.shouldNotBe(visible);
-    }
 }
 
 
