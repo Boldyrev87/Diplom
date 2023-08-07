@@ -2,7 +2,6 @@ package ru.netology.page;
 
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
-import lombok.SneakyThrows;
 
 import static com.codeborne.selenide.Selenide.$x;
 
@@ -17,7 +16,6 @@ public class MainPage {
         buttonBuyInCredit.shouldBe(Condition.visible);
     }
 
-    @SneakyThrows
     public PaymentPage chooseCardPayment() {
         buttonBuy.click();
         return new PaymentPage();

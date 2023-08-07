@@ -34,36 +34,36 @@ public class CreditTest {
 
     @Test
     @DisplayName("Успешная оплата по активной карте")
-    void shouldBuy() {
+    void shouldBeSuccessfulCard() {
         Card cardInfo = DataHelper.getValidCardInfo();
         card.pay(cardInfo);
-        card.approved();
+        card.checkConfirmedNotification();
         CreditRequestEntity entity = DBUtils.creditRequestEntity();
         Assertions.assertEquals("APPROVED", entity.getStatus());
     }
 
     @Test
     @DisplayName("Отклонение оплаты по заблокированной карте")
-    void shouldNotBuy() {
+    void shouldBeDeclinedCard() {
         card.pay(DataHelper.getValidCardInfo().withNumber(DataHelper.cardNumberDeclined()));
-        card.declined();
+        card.checkRejectedNotification();
         CreditRequestEntity entity = DBUtils.creditRequestEntity();
         Assertions.assertEquals("DECLINED", entity.getStatus());
     }
 
     @Test
     @DisplayName("Пустое поле Номер карты")
-    void shouldNotBuyEmptyNumberCard() {
+    void shouldWithEmptyNumberCard() {
         card.pay(DataHelper.getValidCardInfo().withNumber(DataHelper.cardNumberEmpty()));
-        card.wrongFormatNotification();
+        card.checkWrongFormatFieldNotification();
         DBUtils.assertDbEmpty();
     }
 
     @Test
     @DisplayName("Ввод некорректных данных в поле Номер карты")
-    void shouldNotBuyLetterNumberCard() {
+    void shouldIncorrectNumberCard() {
         card.pay(DataHelper.getValidCardInfo().withNumber("johnwick"));
-        card.wrongFormatNotification();
+        card.checkWrongFormatFieldNotification();
         DBUtils.assertDbEmpty();
     }
 
@@ -71,16 +71,16 @@ public class CreditTest {
     @DisplayName("Ввод некорректного номера карты")
     void shouldNotBuyInvalidPatternNumberCard() {
         card.pay(DataHelper.getValidCardInfo().withNumber(DataHelper.invalidCardNumber()));
-        card.declined();
+        card.checkRejectedNotification();
         CreditRequestEntity entity = DBUtils.creditRequestEntity();
         Assertions.assertNotNull(entity);
     }
 
     @Test
     @DisplayName("Пустое поле Месяц")
-    void shouldNotBuyEmptyMonth() {
+    void shouldWithEmptyMonth() {
         card.pay(DataHelper.getValidCardInfo().withMonth(""));
-        card.wrongFormatNotification();
+        card.checkWrongFormatFieldNotification();
         DBUtils.assertDbEmpty();
     }
 
@@ -88,15 +88,15 @@ public class CreditTest {
     @DisplayName("Ввод некорректных данных в поле Месяц")
     void shouldNotBuyLetterMonth() {
         card.pay(DataHelper.getValidCardInfo().withMonth("johnwick"));
-        card.wrongFormatNotification();
+        card.checkWrongFormatFieldNotification();
         DBUtils.assertDbEmpty();
     }
 
     @Test
     @DisplayName("Пустое поле Год")
-    void shouldNotBuyEmptyYear() {
+    void shouldWithEmptyYear() {
         card.pay(DataHelper.getValidCardInfo().withYear(""));
-        card.wrongFormatNotification();
+        card.checkWrongFormatFieldNotification();
         DBUtils.assertDbEmpty();
     }
 
@@ -104,13 +104,13 @@ public class CreditTest {
     @DisplayName("Ввод некорректных данных в поле Год")
     void shouldNotBuyLetterYear() {
         card.pay(DataHelper.getValidCardInfo().withYear("johnwick"));
-        card.wrongFormatNotification();
+        card.checkWrongFormatFieldNotification();
         DBUtils.assertDbEmpty();
     }
 
     @Test
     @DisplayName("Пустое поле Владелец")
-    void shouldNotBuyEmptyHolder() {
+    void shouldWithEmptyHolder() {
         card.pay(DataHelper.getValidCardInfo().withName(""));
         card.requiredFieldNotification();
         DBUtils.assertDbEmpty();
@@ -120,14 +120,14 @@ public class CreditTest {
     @DisplayName("Ввод некорректных данных в поле Владелец")
     void shouldNotBuyInvalidLocaleHolder() {
         card.pay(DataHelper.getValidCardInfo().withName("98765"));
-        card.wrongFormatNotification();
+        card.checkWrongFormatFieldNotification();
         DBUtils.assertDbEmpty();
     }
 
 
     @Test
     @DisplayName("Пустое поле CVC/CVV")
-    void shouldNotBuyEmptyCVC() {
+    void shouldWithEmptyCVC() {
         card.pay(DataHelper.getValidCardInfo().withCVV(""));
         card.requiredFieldNotification();
         DBUtils.assertDbEmpty();
@@ -137,7 +137,7 @@ public class CreditTest {
     @DisplayName("Ввод некорректных данных в поле CVC/CVV")
     void shouldNotBuyLetterCVC() {
         card.pay(DataHelper.getValidCardInfo().withCVV("johnwick"));
-        card.wrongFormatNotification();
+        card.checkWrongFormatFieldNotification();
         DBUtils.assertDbEmpty();
     }
 }

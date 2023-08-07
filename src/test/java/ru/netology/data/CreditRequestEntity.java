@@ -4,5 +4,8 @@ import lombok.Data;
 
 @Data
 public class CreditRequestEntity {
-    private String status;
+    String id;
+    String bank_id;
+    String created;
+    String status;
 }

@@ -35,17 +35,17 @@ public class CreditPage {
         element.setValue(value);
     }
 
-    public void approved() {
+    public void checkConfirmedNotification() {
         SelenideElement successfulNotification = $(".notification_status_ok .notification__content").shouldHave(Condition.text("Операция одобрена Банком."), Duration.ofMillis(20000));
         successfulNotification.shouldBe(Condition.visible);
     }
 
-    public void declined() {
+    public void checkRejectedNotification() {
         SelenideElement declineNotification = $(".notification_status_error .notification__content").shouldHave(Condition.text("Ошибка! Банк отказал в проведении операции."), Duration.ofMillis(15000));
         declineNotification.shouldBe(Condition.visible);
     }
 
-    public void wrongFormatNotification() {
+    public void checkWrongFormatFieldNotification() {
         SelenideElement wrongFormat = $(".input__sub").shouldHave(Condition.text("Неверный формат"));
         wrongFormat.shouldBe(Condition.visible);
     }

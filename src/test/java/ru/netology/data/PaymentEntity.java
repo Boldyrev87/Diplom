@@ -4,8 +4,11 @@ import lombok.Data;
 
 @Data
 public class PaymentEntity {
-    private String status;
-    private Integer amount;
+    String id;
+    String amount;
+    String created;
+    String status;
+    String transaction_id;
 
 
 }
